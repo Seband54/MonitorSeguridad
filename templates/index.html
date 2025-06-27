@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor de Seguridad</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0e1117;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-top: 30px;
+            font-size: 2rem;
+            color: #40c9ff;
+        }
+
+        .video-container {
+            margin-top: 20px;
+            border: 4px solid #40c9ff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(64, 201, 255, 0.3);
+        }
+
+        img {
+            width: 640px;
+            height: 480px;
+            display: block;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monitor de Seguridad Industrial</h1>
+
+    <div class="video-container">
+        <img src="{{ url_for('video_feed') }}" alt="Streaming de cámara">
+    </div>
+    <div id="estado-texto" style="margin-top: 10px; font-size: 1.1rem;">
+        <p>Estado del equipo de seguridad: <strong id="equipo-texto" style="color:#00ffcc;">Cargando...</strong></p>
+        <p>Estado de atención: <strong id="sueno-texto" style="color:#ffcc00;">Cargando...</strong></p>
+    </div>
+
+    <footer>
+        <p>© 2025 - Sistema de Prevención de Accidentes</p>
+    </footer>
+
+    <script>
+        function actualizarEstados() {
+            fetch('/estado')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("equipo-texto").innerText = data.equipo;
+                    document.getElementById("sueno-texto").innerText = data.sueno;
+                })
+                .catch(err => console.error("Error al obtener estado:", err));
+        }
+
+        setInterval(actualizarEstados, 1000); // actualiza cada segundo
+    </script>
+</body>
+</html>
