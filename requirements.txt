@@ -1,8 +1,0 @@
-flask
-torch
-torchvision
-opencv-python
-matplotlib
-pygame
-mediapipe
-ultralytics
