@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitor de Seguridad</title>
+    <style>
+        body {
+            background-color: #0e1117;
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 30px;
+        }
+        video, canvas, img {
+            width: 640px;
+            height: 480px;
+            border: 4px solid #40c9ff;
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monitor de Seguridad Industrial</h1>
+    <video id="video" autoplay muted></video>
+    <img id="output" alt="Procesado" />
+    <p>Estado del equipo de seguridad: <strong id="equipo-texto" style="color:#00ffcc;">Cargando...</strong></p>
+    <p>Estado de atención: <strong id="sueno-texto" style="color:#ffcc00;">Cargando...</strong></p>
+    <footer>
+        <p>© 2025 - Sistema de Prevención de Accidentes</p>
+    </footer>
+
+    <script>
+        const video = document.getElementById('video');
+        const output = document.getElementById('output');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; });
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        async function capturarYEnviarFrame() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            const dataUrl = canvas.toDataURL('image/jpeg');
+
+            const res = await fetch('/procesar_frame', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ frame: dataUrl })
+            });
+
+            const data = await res.json();
+            output.src = data.frame;
+            document.getElementById('equipo-texto').innerText = data.equipo;
+            document.getElementById('sueno-texto').innerText = data.sueno;
+        }
+
+        setInterval(capturarYEnviarFrame, 1000); // cada segundo
+    </script>
+</body>
+</html>
